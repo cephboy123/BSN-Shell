@@ -53,7 +53,43 @@ app.post('/api/execute', (req, res) => {
 
 // NOUVELLE ROUTE API SPÉCIALE POUR AIDER
 // Elle lance Aider en arrière-plan avec la consigne (prompt) que vous lui donnez
+// NOUVELLE ROUTE API SPÉCIALE POUR AIDER (MODE ASYNCHRONE)
 app.post('/api/aider', (req, res) => {
+    const { prompt } = req.body;
+    if (!prompt) return res.status(400).json({ error: 'Aucun prompt fourni pour Aider.' });
+
+    const apiKey = process.env.GEMINI_API_KEY || '';
+    
+    // On lance Aider en arrière-plan (&) et on redirige les logs dans un fichier aider.log
+    const aiderCmd = `export GEMINI_API_KEY="${apiKey}" && aider --model gemini/gemini-2.5-flash --message "${prompt.replace(/"/g, '\\"')}" --yes > aider.log 2>&1 &`;
+
+    console.log(`Lancement d'Aider en arrière-plan pour : ${prompt}`);
+
+    // On répond immédiatement pour éviter le timeout 502 de Render
+    res.json({ 
+        success: true, 
+        message: 'Aider a été lancé en arrière-plan sur le serveur !' 
+    });
+
+    exec(aiderCmd, { cwd: __dirname }, (error) => {
+        if (error) {
+            console.error(`Erreur d'exécution Aider: ${error.message}`);
+        }
+    });
+});
+
+// Route pour lire ce qu'Aider a fait
+app.get('/api/logs', (req, res) => {
+    const fs = require('fs');
+    const path = require('path');
+    const logPath = path.join(__dirname, 'aider.log');
+    if (fs.existsSync(logPath)) {
+        res.type('text/plain').send(fs.readFileSync(logPath, 'utf8'));
+    } else {
+        res.send('Aucun journal pour le moment.');
+    }
+});
+
     const { prompt } = req.body;
     if (!prompt) return res.status(400).json({ error: 'Aucun prompt fourni pour Aider.' });
 
