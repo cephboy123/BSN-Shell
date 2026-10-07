@@ -62,7 +62,7 @@ app.post('/api/aider', (req, res) => {
     
     // Commande pour lancer Aider en mode non-interactif (--yes ou --message)
     // Ici on utilise --message pour lui donner l'ordre directement et quitter
-    const aiderCmd = `export GEMINI_API_KEY="${apiKey}" && aider --model gemini/gemini-1.5-flash --message "${prompt.replace(/"/g, '\\"')}" --yes`;
+    const aiderCmd = `export GEMINI_API_KEY="${apiKey}" && aider --model gemini/gemini-2.5-flash --message "${prompt.replace(/"/g, '\\"')}" --yes`;
 
     console.log(`Lancement d'Aider avec la consigne : ${prompt}`);
 
