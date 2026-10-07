@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Terminal IA - Cephboy</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+    <style>
+        body { background: #090d16; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        h2 { margin-bottom: 10px; color: #38bdf8; }
+        #terminal-box { width: 90%; max-width: 900px; height: 500px; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 1px solid #1e293b; }
+    </style>
+</head>
+<body>
+    <h2>🖥️ Terminal Distant & Agent IA</h2>
+    <div id="terminal-box"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const term = new Terminal({ cursorBlink: true, theme: { background: '#0f172a', foreground: '#f8fafc' } });
+        term.open(document.getElementById('terminal-box'));
+
+        const socket = io();
+        term.onData(data => socket.emit('input', data));
+        socket.on('output', data => term.write(data));
+    </script>
+</body>
+</html>
